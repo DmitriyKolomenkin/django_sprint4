@@ -245,3 +245,4 @@ class CommentUpdateView(EditContentMixin, CommentFormMixin, UpdateView):
 
 class CommentDeleteView(EditContentMixin, CommentMixin, DeleteView):
     pass
+
