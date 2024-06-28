@@ -70,7 +70,10 @@ class CategoryListView(PostListMixin, ListView):
     template_name = 'blog/category.html'
 
     def get_queryset(self) -> QuerySet[Any]:
-        category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        category = get_object_or_404(
+            Category,
+            slug=self.kwargs['category_slug']
+        )
         return get_general_posts_filter().filter(category=category)
 
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
