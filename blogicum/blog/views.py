@@ -121,7 +121,7 @@ class CategoryListView(PostListMixin, ListView):
             slug=self.kwargs['category_slug'],
         )
         return context
-    
+
     def get_queryset(self) -> QuerySet[Any]:
         return get_general_posts_filter().filter(
             category__slug=self.kwargs['category_slug'],
