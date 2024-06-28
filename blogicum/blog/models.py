@@ -1,15 +1,17 @@
 from django.db import models
+
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.contrib.auth.models import User
 
-LENGHT = 256
-LAST_POST = 5
+from django.urls import reverse
+
+from .constants import LAST_POST, LENGHT, MX_COMMENT_LENGHT
+
 
 User = get_user_model()
 
 
-class BaseModel(models.Model):
+class IsPublishedCreatedAtModel(models.Model):
     is_published = models.BooleanField(
         default=True,
         verbose_name='Опубликовано',
@@ -25,7 +27,7 @@ class BaseModel(models.Model):
         ordering = ('created_at',)
 
 
-class Category(BaseModel):
+class Category(IsPublishedCreatedAtModel):
     title = models.CharField(
         max_length=LENGHT,
         verbose_name='Заголовок',
@@ -38,7 +40,7 @@ class Category(BaseModel):
                    'разрешены символы латиницы, цифры, дефис и подчёркивание.')
     )
 
-    class Meta:
+    class Meta(IsPublishedCreatedAtModel.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
@@ -46,13 +48,13 @@ class Category(BaseModel):
         return self.title
 
 
-class Location(BaseModel):
+class Location(IsPublishedCreatedAtModel):
     name = models.CharField(
         max_length=LENGHT,
         verbose_name='Название места',
     )
 
-    class Meta:
+    class Meta(IsPublishedCreatedAtModel.Meta):
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
@@ -60,7 +62,7 @@ class Location(BaseModel):
         return self.name
 
 
-class Post(BaseModel):
+class Post(IsPublishedCreatedAtModel):
     title = models.CharField(
         max_length=LENGHT,
         verbose_name='Заголовок',
@@ -96,7 +98,7 @@ class Post(BaseModel):
         verbose_name='Категория',
     )
 
-    class Meta:
+    class Meta(IsPublishedCreatedAtModel.Meta):
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
         default_related_name = 'posts'
@@ -109,7 +111,7 @@ class Post(BaseModel):
         return reverse("blog:post_detail", args={self.pk})
 
 
-class Comment(BaseModel):
+class Comment(IsPublishedCreatedAtModel):
 
     author = models.ForeignKey(
         User,
@@ -125,11 +127,11 @@ class Comment(BaseModel):
 
     text = models.TextField(verbose_name='Текст комментария')
 
-    class Meta:
+    class Meta(IsPublishedCreatedAtModel.Meta):
         default_related_name = 'comments'
         verbose_name = 'комментарий'
         verbose_name_plural = 'Коментарии'
         ordering = ('created_at',)
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:MX_COMMENT_LENGHT]

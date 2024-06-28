@@ -14,22 +14,8 @@ from django.views.generic import (
 
 from .forms import CommentForm, PostForm
 from .models import Category, Comment, Post, User
-
-PAGINATE_COUNT: int = 10
-
-
-def get_general_posts_filter() -> QuerySet[Any]:
-    return Post.objects.select_related(
-        'author',
-        'location',
-        'category',
-    ).filter(
-        pub_date__lte=timezone.now(),
-        is_published=True,
-        category__is_published=True,
-    ).annotate(
-        comment_count=Count('comments')
-    ).order_by('-pub_date')
+from .constants import PAGINATE_COUNT
+from .service import get_general_posts_filter
 
 
 class EditContentMixin(LoginRequiredMixin):
@@ -111,6 +97,7 @@ class PostDetailView(PostMixin, DetailView):
             or post.category.is_published is False
             or post.pub_date > timezone.now()
         ):
+            # return get_object_or_404(Post, pk=post.pk)
             raise Http404
         return post
 
@@ -126,11 +113,6 @@ class PostDetailView(PostMixin, DetailView):
 class CategoryListView(PostListMixin, ListView):
     template_name = 'blog/category.html'
 
-    def get_queryset(self) -> QuerySet[Any]:
-        return get_general_posts_filter().filter(
-            category__slug=self.kwargs['category_slug'],
-        )
-
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(
@@ -139,6 +121,11 @@ class CategoryListView(PostListMixin, ListView):
             slug=self.kwargs['category_slug'],
         )
         return context
+    
+    def get_queryset(self) -> QuerySet[Any]:
+        return get_general_posts_filter().filter(
+            category__slug=self.kwargs['category_slug'],
+        )
 
 
 class PostCreateView(
@@ -185,6 +172,7 @@ class ProfilePostListView(PostListMixin, ListView):
             User,
             username=self.kwargs['username']
         )
+
         return Post.objects.select_related(
             'author',
             'location',

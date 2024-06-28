@@ -1,10 +1,11 @@
 from django.contrib import admin
 
-from .models import Post, Category, Location
+from .models import Category, Comment, Post, Location
 
-# admin.site.register(Post)
+
 admin.site.register(Category)
 admin.site.register(Location)
+admin.site.register(Comment)
 
 
 class BlogAdmin(admin.ModelAdmin):
