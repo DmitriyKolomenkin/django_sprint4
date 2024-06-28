@@ -1,11 +1,9 @@
 from typing import Any, Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import get_user
 from django.db.models import Count
 from django.db.models.query import QuerySet
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic import (
     CreateView,
@@ -16,7 +14,7 @@ from django.views.generic import (
 )
 
 from .forms import CommentForm, PostForm
-from .models import Category, Comment, Post, User
+from .models import Category, Post, User
 from .constants import PAGINATE_COUNT
 from .service import get_general_posts_filter
 from .mixins import (
@@ -74,7 +72,7 @@ class CategoryListView(PostListMixin, ListView):
     def get_queryset(self) -> QuerySet[Any]:
         category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
         return get_general_posts_filter().filter(category=category)
-    
+
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(
@@ -155,7 +153,7 @@ class ProfilePostListView(AddAuthorMixin, ListView):
             User,
             username=self.kwargs['username'])
         return context
-    
+
 
 class EditProfileUpdateView(
     LoginRequiredMixin,

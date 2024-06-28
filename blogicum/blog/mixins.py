@@ -29,8 +29,8 @@ class EditContentMixin(LoginRequiredMixin):
                 post_id=self.kwargs['post_id']
             )
         return super().dispatch(request, *args, **kwargs)
-    
-    
+
+
 class ValidationMixin:
 
     def form_valid(self, form):
@@ -83,4 +83,3 @@ class CommentMixin(RedirectionPostMixin):
 
 class CommentFormMixin(CommentMixin):
     form_class = CommentForm
-
